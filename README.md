@@ -18,7 +18,7 @@ Air pollution research often involves multiple disconnected tasks:
 - documenting intervention observations
 - exporting findings for presentations or reports
 
-AirLens brings these workflows into a single platform designed for climate-tech research and outreach use cases.
+AirLens brings these workflows into a single platform designed for climate-tech research, documentation, and outreach use cases.
 
 ---
 
@@ -50,16 +50,12 @@ AirLens brings these workflows into a single platform designed for climate-tech 
 - Generates structured research briefs from computed AQI metrics
 - Includes objective, methodology, key findings, pollutant interpretation, limitations, and conclusion
 - Supports technical, public, and stakeholder-oriented summaries
-- Avoids fake numbers by using computed dataset metrics only
+- Uses computed dataset metrics instead of dummy or hardcoded numbers
 
 ### Content Studio
 
 - Generates communication drafts from real pollution analysis
-- Supports:
-  - blog drafts
-  - awareness points
-  - LinkedIn-style public posts
-  - stakeholder notes
+- Supports blog drafts, awareness points, LinkedIn-style posts, and stakeholder notes
 - Helps convert research findings into public-facing communication material
 
 ### Outreach CRM
@@ -119,11 +115,14 @@ AirLens brings these workflows into a single platform designed for climate-tech 
 
 ---
 
-## Dataset Used
+## Dataset
 
-This project is designed for the **Air Quality in India 2015–2024** dataset.
+AirLens is designed for the **Air Quality in India 2015–2024** dataset.
 
 Primary file used:
+
+```text
+city_day.csv
 
 ```text
 city_day.csv
