@@ -48,7 +48,7 @@ function Brand() {
         <span className="block text-lg font-semibold tracking-tight text-white">
           AirLens
         </span>
-        <span className="block text-xs text-slate-400">Climate intelligence</span>
+        <span className="block text-xs text-slate-300">Climate intelligence</span>
       </span>
     </Link>
   );
@@ -68,8 +68,8 @@ function NavigationLinks({ compact = false }: { compact?: boolean }) {
           "flex items-center gap-3 rounded-xl text-sm font-medium transition-colors",
           compact ? "shrink-0 px-3 py-2.5" : "px-3 py-2.5",
           isActive
-            ? "bg-emerald-500/15 text-emerald-300"
-            : "text-slate-400 hover:bg-white/5 hover:text-white",
+            ? "bg-emerald-400/15 text-emerald-200 ring-1 ring-inset ring-emerald-400/15"
+            : "text-slate-300 hover:bg-white/[0.07] hover:text-white",
         )}
       >
         <Icon className="size-[18px]" />
@@ -84,18 +84,18 @@ export function Sidebar() {
     <>
       <aside className="fixed inset-y-0 left-0 hidden w-72 flex-col bg-sidebar px-5 py-6 lg:flex">
         <Brand />
-        <p className="mb-3 mt-10 px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+        <p className="mb-3 mt-10 px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">
           Workspace
         </p>
         <nav aria-label="Primary navigation" className="space-y-1">
           <NavigationLinks />
         </nav>
         <div className="mt-auto rounded-2xl border border-emerald-400/10 bg-white/[0.04] p-4">
-          <Badge className="border-emerald-400/20 bg-emerald-400/10 text-emerald-300">
+          <Badge className="border-emerald-300/25 bg-emerald-400/15 text-emerald-200">
             <Leaf className="size-3.5" />
             MVP foundation
           </Badge>
-          <p className="mt-3 text-sm leading-6 text-slate-400">
+          <p className="mt-3 text-sm leading-6 text-slate-300">
             Deterministic intelligence built from verified air quality data.
           </p>
         </div>

@@ -14,9 +14,9 @@ import type { ModuleOverview } from "@/lib/types";
 
 export function PageShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f6f8f5] text-slate-900">
       <Sidebar />
-      <div className="min-w-0 lg:pl-72">
+      <div className="min-h-screen min-w-0 bg-[#f6f8f5] lg:pl-72">
         <Topbar />
         <main className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-10 lg:py-9">
           {children}
@@ -73,7 +73,7 @@ export function ModulePlaceholder({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
             Real metrics will appear here once the dataset workflow is implemented.
           </p>
         </CardContent>

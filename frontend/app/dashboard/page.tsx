@@ -33,8 +33,8 @@ export default function DashboardPage() {
         {metrics.map((metric) => (
           <Card key={metric} className="p-5">
             <CardDescription>{metric}</CardDescription>
-            <CardTitle className="mt-4 text-3xl text-slate-300">--</CardTitle>
-            <p className="mt-2 text-xs text-slate-400">Awaiting cleaned dataset</p>
+            <CardTitle className="mt-4 text-3xl text-slate-500">--</CardTitle>
+            <p className="mt-2 text-xs text-slate-500">Awaiting cleaned dataset</p>
           </Card>
         ))}
       </div>

@@ -8,9 +8,9 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const variants: Record<BadgeVariant, string> = {
-  accent: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  neutral: "border-slate-200 bg-slate-100 text-slate-600",
-  outline: "border-slate-200 bg-white text-slate-600",
+  accent: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  neutral: "border-slate-200 bg-slate-100 text-slate-700",
+  outline: "border-slate-200 bg-white text-slate-700",
 };
 
 export function Badge({

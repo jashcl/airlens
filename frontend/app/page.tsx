@@ -101,7 +101,7 @@ export default function OverviewPage() {
           <Card className="border-emerald-100 bg-white/90 p-5 sm:p-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-5">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
                   Workspace pipeline
                 </p>
                 <p className="mt-2 font-semibold text-slate-900">
@@ -123,7 +123,9 @@ export default function OverviewPage() {
                       </span>
                       {label}
                     </div>
-                    <span className="text-xs text-slate-400">Planned</span>
+                    <span className="text-xs font-medium text-slate-500">
+                      Planned
+                    </span>
                   </div>
                 ),
               )}
@@ -166,7 +168,7 @@ export default function OverviewPage() {
               A complete research and outreach toolkit
             </h2>
           </div>
-          <p className="max-w-sm text-sm leading-6 text-slate-500">
+          <p className="max-w-sm text-sm leading-6 text-slate-600">
             Functional capabilities arrive as real dataset workflows are built.
           </p>
         </div>
@@ -197,7 +199,7 @@ export default function OverviewPage() {
         <Link
           href="/datasets"
           className={buttonStyles({
-            className: "shrink-0 bg-emerald-500 hover:bg-emerald-400",
+            className: "shrink-0",
           })}
         >
           Open datasets

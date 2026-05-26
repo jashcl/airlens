@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f8f7;
-  --foreground: #10231f;
-  --muted-foreground: #5e716d;
+  --background: #f6f8f5;
+  --foreground: #0f172a;
+  --muted-foreground: #52625e;
   --card: #ffffff;
-  --border: #e2ebe8;
-  --accent: #0f9f7a;
-  --accent-soft: #e5f6f1;
-  --sidebar: #071c1a;
+  --border: #dfe7e3;
+  --accent: #047857;
+  --accent-soft: #e7f6ef;
+  --sidebar: #071f1d;
 }
 
 @theme inline {
@@ -28,6 +28,10 @@
   box-sizing: border-box;
 }
 
+html {
+  background: var(--background);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -41,8 +45,8 @@ body {
 
 .hero-grid {
   background-image:
-    radial-gradient(circle at 80% 15%, rgba(16, 185, 129, 0.16), transparent 30%),
-    linear-gradient(rgba(15, 159, 122, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 159, 122, 0.05) 1px, transparent 1px);
+    radial-gradient(circle at 80% 15%, rgba(16, 185, 129, 0.13), transparent 30%),
+    linear-gradient(rgba(4, 120, 87, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(4, 120, 87, 0.045) 1px, transparent 1px);
   background-size: auto, 36px 36px, 36px 36px;
 }
