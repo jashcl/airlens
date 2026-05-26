@@ -1,73 +1,129 @@
 # AirLens — Climate-Tech Research & Outreach Intelligence Platform
 
-AirLens is a full-stack climate-tech workspace that converts real Indian air quality data into dashboards, research briefs, content drafts, stakeholder outreach records, research notes, biofiltration comparison observations, and Markdown/LaTeX reports.
+AirLens is a full-stack climate-tech research workspace that converts real Indian air quality datasets into AQI dashboards, research briefs, public communication drafts, stakeholder outreach records, research notes, biofiltration observations, and exportable reports.
 
-## Live Demo
-- Frontend: add Vercel URL here
-- Backend API: add Render URL here
+The project was built around a real-world research and outreach workflow for air pollution and climate-tech teams. Instead of being only a dashboard, AirLens connects data analysis, documentation, reporting, content drafting, and stakeholder coordination in one workspace.
 
-## Problem Statement
-Air pollution research often requires cleaning spreadsheets, analyzing pollutant trends, writing reports, preparing public communication, and managing outreach records separately. AirLens combines these workflows into one research-to-communication platform.
+---
 
-## Dataset
-Primary dataset: Air Quality in India 2015–2024. Main file used: `city_day.csv`.
+## Project Purpose
 
-Expected columns include City, Date/Datetime, AQI, PM2.5, PM10, NO, NO2, NOx, NH3, CO, SO2, O3, and AQI_Bucket.
+Air pollution research often involves multiple disconnected tasks:
 
-## Features
-- Real CSV upload and validation
-- Data cleaning summary with missing values before/after
-- AQI trend dashboard and pollutant charts
-- Worst pollution days and anomaly detection
-- Research brief generation from computed metrics
-- Blog, LinkedIn, awareness, and stakeholder draft generation
-- Outreach CRM for stakeholder records and email drafts
-- Research log for sources and activity notes
-- Biofiltration/intervention before-after comparison
-- Markdown and LaTeX export
+- collecting and cleaning air quality datasets
+- analyzing pollutant trends
+- preparing research notes and reports
+- creating public communication material
+- maintaining stakeholder outreach records
+- documenting intervention observations
+- exporting findings for presentations or reports
+
+AirLens brings these workflows into a single platform designed for climate-tech research and outreach use cases.
+
+---
+
+## Key Features
+
+### Dataset Upload and Cleaning
+
+- Upload real `city_day.csv` air quality data
+- Validate required columns such as City, Date/Datetime, and AQI
+- Detect supported pollutant columns
+- Remove duplicate records
+- Convert dates and numeric pollutant fields
+- Fill missing pollutant values using city-wise median and overall median
+- Generate a data quality summary
+- Store cleaned dataset for downstream analysis
+
+### AQI and Pollutant Dashboard
+
+- City-wise AQI summary
+- AQI trend visualization
+- PM2.5 and PM10 comparison
+- Pollutant-wise average comparison
+- AQI bucket distribution
+- Worst pollution days
+- Simple anomaly detection using AQI thresholding
+
+### Research Brief Generator
+
+- Generates structured research briefs from computed AQI metrics
+- Includes objective, methodology, key findings, pollutant interpretation, limitations, and conclusion
+- Supports technical, public, and stakeholder-oriented summaries
+- Avoids fake numbers by using computed dataset metrics only
+
+### Content Studio
+
+- Generates communication drafts from real pollution analysis
+- Supports:
+  - blog drafts
+  - awareness points
+  - LinkedIn-style public posts
+  - stakeholder notes
+- Helps convert research findings into public-facing communication material
+
+### Outreach CRM
+
+- Add and manage stakeholder contacts
+- Track NGOs, colleges, researchers, government bodies, and climate groups
+- Maintain outreach status, notes, contact details, and follow-up dates
+- Generate outreach email drafts using city-level air quality insights
+
+### Research Log
+
+- Maintain research activity records
+- Store source names, URLs, summaries, tags, and status
+- Track research notes, article references, dataset observations, and draft ideas
+
+### Biofiltration / Intervention Comparison
+
+- Document before-and-after pollutant observations
+- Calculate reduction percentage
+- Generate observation notes
+- Designed as a software documentation module, not a physical hardware implementation
+
+### Report Export
+
+- Generate Markdown research reports
+- Generate LaTeX report source
+- Useful for technical documentation and research-style reporting
+
+---
 
 ## Tech Stack
-Frontend: Next.js, TypeScript, Tailwind CSS, Recharts  
-Backend: FastAPI, Python, Pandas, SQLAlchemy, SQLite  
-Deployment: Vercel frontend, Render backend
 
-## Local Setup
+### Frontend
 
-Backend:
-```bash
-cd backend
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Recharts
+- Lucide React
 
-Frontend:
-```bash
-cd frontend
-npm install
-npm run dev
-```
+### Backend
 
-Open frontend at `http://localhost:3000` and backend docs at `http://127.0.0.1:8000/docs`.
+- FastAPI
+- Python
+- Pandas
+- NumPy
+- SQLAlchemy
+- SQLite
 
-## Deployment
-Backend on Render:
-- Root directory: `backend`
-- Build command: `pip install -r requirements.txt`
-- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Env var: `FRONTEND_URL=https://your-vercel-url.vercel.app`
+### Tools
 
-Frontend on Vercel:
-- Root directory: `frontend`
-- Env var: `NEXT_PUBLIC_API_BASE_URL=https://your-render-backend.onrender.com`
+- Git
+- GitHub
+- VS Code
+- Render
+- Vercel
 
-## Limitations
-For demo deployment, uploaded CSV files are stored locally on the backend service. Free Render instances may reset local files, so users may need to upload the dataset again after service restart. In production, use PostgreSQL and object storage such as S3.
+---
 
-## Future Scope
-- OpenAQ API integration
-- Hourly analysis using `city_hour.csv`
-- Station-level analysis
-- PDF report generation
-- Authentication and persistent multi-user workspaces
+## Dataset Used
+
+This project is designed for the **Air Quality in India 2015–2024** dataset.
+
+Primary file used:
+
+```text
+city_day.csv
