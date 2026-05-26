@@ -1,39 +1,21 @@
-"""FastAPI application entrypoint for AirLens."""
-
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from .database import Base, engine
+from .routers import datasets, analysis, reports, content, outreach, research_log, biofiltration
 
-from app.routers import (
-    analysis,
-    biofiltration,
-    content,
-    datasets,
-    outreach,
-    reports,
-    research_log,
-)
-from app.schemas import HealthResponse
+Base.metadata.create_all(bind=engine)
 
+app = FastAPI(title="AirLens API", version="1.0.0")
+origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+if os.getenv("FRONTEND_URL"):
+    origins.append(os.getenv("FRONTEND_URL"))
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
-app = FastAPI(
-    title="AirLens API",
-    description="Backend API for climate-tech research and outreach intelligence.",
-    version="0.1.0",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.get("/health", response_model=HealthResponse, tags=["Health"])
-def health_check() -> HealthResponse:
-    """Return the API availability status."""
-    return HealthResponse(status="ok")
-
+@app.get("/")
+def root(): return {"app": "AirLens API", "status": "running", "docs": "/docs", "health": "/health"}
+@app.get("/health")
+def health(): return {"status": "ok"}
 
 app.include_router(datasets.router)
 app.include_router(analysis.router)

@@ -1,28 +1,3 @@
-import {
-  ModulePlaceholder,
-  PageHeader,
-} from "@/components/layout/PageShell";
-import type { ModuleOverview } from "@/lib/types";
-
-const moduleOverview: ModuleOverview = {
-  label: "Research output",
-  title: "Research brief",
-  description:
-    "Translate measured air quality findings into a concise, defensible narrative.",
-  purpose:
-    "The research brief module will organize actual dashboard findings into structured context, methodology, key observations, and implications.",
-  capabilities: [
-    "Select computed metrics to support written findings.",
-    "Generate a clear brief outline from verified analysis.",
-    "Preserve data context and methodological notes.",
-  ],
-};
-
-export default function ResearchBriefPage() {
-  return (
-    <>
-      <PageHeader {...moduleOverview} />
-      <ModulePlaceholder {...moduleOverview} />
-    </>
-  );
-}
+"use client";
+import { useEffect,useState } from "react"; import { PageShell } from "@/components/layout/PageShell"; import { Card } from "@/components/ui/Card"; import { Button } from "@/components/ui/Button"; import { Badge } from "@/components/ui/Badge"; import { getCities,generateBrief,downloadText } from "@/lib/api";
+export default function Page(){ const [cities,setCities]=useState<string[]>([]),[city,setCity]=useState(""),[aud,setAud]=useState("technical"),[brief,setBrief]=useState<any>(null),[err,setErr]=useState(""); useEffect(()=>{getCities().then(c=>{setCities(c); setCity(c[0]||"")}).catch(e=>setErr(e.message))},[]); async function gen(){try{setBrief(await generateBrief(city,aud))}catch(e:any){setErr(e.message)}} return <PageShell><div className="space-y-6"><div><Badge>Technical writing</Badge><h1 className="mt-4 text-4xl font-bold text-slate-950">Research Brief</h1><p className="text-slate-600">Generate structured documentation from computed AQI metrics.</p></div><Card><div className="flex flex-wrap gap-3"><select className="rounded-2xl border p-2" value={city} onChange={e=>setCity(e.target.value)}>{cities.map(c=><option key={c}>{c}</option>)}</select><select className="rounded-2xl border p-2" value={aud} onChange={e=>setAud(e.target.value)}><option>technical</option><option>public</option><option>stakeholder</option></select><Button onClick={gen}>Generate Research Brief</Button></div>{err&&<p className="mt-3 text-red-600">{err}</p>}</Card>{brief&&<><Card><h2 className="text-xl font-bold text-slate-950">{brief.title}</h2><p className="mt-3 text-slate-600">{brief.executive_summary}</p></Card><Card><h2 className="font-bold text-slate-950">Key findings</h2><ul className="mt-3 list-disc pl-5 text-slate-700">{brief.key_findings.map((k:string)=><li key={k}>{k}</li>)}</ul></Card><Card><div className="mb-4 flex justify-end gap-3"><Button variant="secondary" onClick={()=>navigator.clipboard.writeText(brief.markdown_report)}>Copy</Button><Button onClick={()=>downloadText(`${city}-research-brief.md`, brief.markdown_report)}>Download Markdown</Button></div><pre className="max-h-[520px] overflow-auto whitespace-pre-wrap rounded-2xl bg-slate-950 p-5 text-sm text-slate-100">{brief.markdown_report}</pre></Card></>}</div></PageShell> }

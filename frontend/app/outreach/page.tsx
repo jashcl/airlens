@@ -1,28 +1,4 @@
-import {
-  ModulePlaceholder,
-  PageHeader,
-} from "@/components/layout/PageShell";
-import type { ModuleOverview } from "@/lib/types";
-
-const moduleOverview: ModuleOverview = {
-  label: "Stakeholders",
-  title: "Outreach CRM",
-  description:
-    "Organize relevant stakeholders and prepare evidence-led outreach drafts.",
-  purpose:
-    "The outreach workspace will track stakeholder context, contact status, and communication drafts grounded in approved research findings.",
-  capabilities: [
-    "Record stakeholder organizations and engagement context.",
-    "Prepare email drafts linked to research insights.",
-    "Track follow-up status without sending messages automatically.",
-  ],
-};
-
-export default function OutreachPage() {
-  return (
-    <>
-      <PageHeader {...moduleOverview} />
-      <ModulePlaceholder {...moduleOverview} />
-    </>
-  );
-}
+"use client";
+import { useEffect,useState } from "react"; import { PageShell } from "@/components/layout/PageShell"; import { Card } from "@/components/ui/Card"; import { Button } from "@/components/ui/Button"; import { Badge } from "@/components/ui/Badge"; import { Input } from "@/components/ui/Input"; import { createStakeholder,deleteStakeholder,generateEmail,getCities,listStakeholders } from "@/lib/api";
+const empty={name:"",organization:"",organization_type:"NGO",city:"",email:"",interest_area:"",status:"Not Contacted",notes:""};
+export default function Page(){const [items,setItems]=useState<any[]>([]),[form,setForm]=useState<any>(empty),[cities,setCities]=useState<string[]>([]),[email,setEmail]=useState<any>(null); const load=()=>listStakeholders().then(setItems); useEffect(()=>{load(); getCities().then(setCities).catch(()=>{})},[]); async function add(){await createStakeholder(form); setForm(empty); load()} async function gen(id:number){setEmail(await generateEmail(id, cities[0]||form.city||"Mumbai"))} return <PageShell><div className="space-y-6"><div><Badge>Stakeholder communication</Badge><h1 className="mt-4 text-4xl font-bold text-slate-950">Outreach CRM</h1><p className="text-slate-600">Track partners, NGOs, colleges, researchers, follow-ups, and draft communication.</p></div><Card><div className="grid gap-3 md:grid-cols-4">{["name","organization","organization_type","city","email","interest_area","status","notes"].map(k=><Input key={k} placeholder={k} value={form[k]||""} onChange={e=>setForm({...form,[k]:e.target.value})}/>)}</div><Button className="mt-4" onClick={add}>Add stakeholder</Button></Card><div className="grid gap-4">{items.map(s=><Card key={s.id}><div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-xl font-bold text-slate-950">{s.name}</h2><p className="text-slate-600">{s.organization} · {s.organization_type} · {s.city}</p><Badge className="mt-2">{s.status}</Badge></div><div className="flex gap-2"><Button variant="secondary" onClick={()=>gen(s.id)}>Generate Email</Button><Button variant="ghost" onClick={async()=>{await deleteStakeholder(s.id);load()}}>Delete</Button></div></div></Card>)}</div>{email&&<Card><h2 className="font-bold text-slate-950">{email.subject}</h2><pre className="mt-3 whitespace-pre-wrap rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">{email.email_body}</pre><Button className="mt-3" onClick={()=>navigator.clipboard.writeText(email.email_body)}>Copy email</Button></Card>}</div></PageShell>}

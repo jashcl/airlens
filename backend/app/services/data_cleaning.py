@@ -1,96 +1,72 @@
-"""Deterministic cleaning and data-quality summarisation for city-day data."""
-
-import json
-from dataclasses import dataclass
-
+from __future__ import annotations
 import pandas as pd
+from fastapi import HTTPException
 
-from app.services.data_loader import detected_pollutant_columns
+REQUIRED_COLUMNS = {"City", "Date", "AQI"}
+DATE_ALIASES = {"Datetime": "Date", "date": "Date", "datetime": "Date"}
+POLLUTANTS = ["PM2.5", "PM10", "NO", "NO2", "NOx", "NH3", "CO", "SO2", "O3"]
 
+def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    rename = {}
+    for col in df.columns:
+        if col in DATE_ALIASES:
+            rename[col] = DATE_ALIASES[col]
+        elif col.strip() != col:
+            rename[col] = col.strip()
+    return df.rename(columns=rename)
 
-@dataclass
-class CleaningResult:
-    """Cleaned dataset plus values required by the API summary."""
+def validate_dataframe(df: pd.DataFrame) -> None:
+    if df.empty:
+        raise HTTPException(status_code=400, detail="Uploaded CSV is empty.")
+    missing = sorted(REQUIRED_COLUMNS - set(df.columns))
+    if missing:
+        raise HTTPException(status_code=400, detail=f"Missing required columns: {', '.join(missing)}")
 
-    dataframe: pd.DataFrame
-    original_rows: int
-    duplicate_rows_removed: int
-    missing_values_before: dict[str, int]
-    missing_values_after: dict[str, int]
-    detected_cities: list[str]
-    detected_pollutants: list[str]
-    min_date: str
-    max_date: str
-    preview_rows: list[dict[str, object]]
-
-    @property
-    def cleaned_rows(self) -> int:
-        return len(self.dataframe)
-
-
-def clean_city_day_data(dataframe: pd.DataFrame) -> CleaningResult:
-    """Apply the agreed cleaning rules and prepare a quality summary."""
-    original_rows = len(dataframe)
-    missing_values_before = _missing_value_counts(dataframe)
-    detected_pollutants = detected_pollutant_columns(dataframe)
-
-    cleaned = dataframe.drop_duplicates().copy()
-    duplicate_rows_removed = original_rows - len(cleaned)
-
-    cleaned["Date"] = _parse_date_column(cleaned["Date"])
-
-    numeric_columns = ["AQI", *detected_pollutants]
-    for column in numeric_columns:
-        cleaned[column] = pd.to_numeric(cleaned[column], errors="coerce")
-
-    for pollutant in detected_pollutants:
-        city_median = cleaned.groupby("City")[pollutant].transform("median")
-        overall_median = cleaned[pollutant].median()
-        cleaned[pollutant] = cleaned[pollutant].fillna(city_median)
-        cleaned[pollutant] = cleaned[pollutant].fillna(overall_median)
-
-    cleaned = cleaned.sort_values(["City", "Date"], na_position="last").reset_index(
-        drop=True
-    )
-
-    return CleaningResult(
-        dataframe=cleaned,
-        original_rows=original_rows,
-        duplicate_rows_removed=duplicate_rows_removed,
-        missing_values_before=missing_values_before,
-        missing_values_after=_missing_value_counts(cleaned),
-        detected_cities=_detected_cities(cleaned),
-        detected_pollutants=detected_pollutants,
-        min_date=cleaned["Date"].min().strftime("%Y-%m-%d"),
-        max_date=cleaned["Date"].max().strftime("%Y-%m-%d"),
-        preview_rows=_preview_rows(cleaned),
-    )
-
-
-def _parse_date_column(date_column: pd.Series) -> pd.Series:
-    parsed_dates = pd.to_datetime(date_column, errors="coerce")
-    invalid_dates = int(parsed_dates.isna().sum())
-    if invalid_dates:
-        raise ValueError(
-            "Date column contains "
-            f"{invalid_dates} missing or invalid value(s). Every Date must be parseable."
-        )
-    return parsed_dates
-
-
-def _missing_value_counts(dataframe: pd.DataFrame) -> dict[str, int]:
-    return {
-        column: int(count)
-        for column, count in dataframe.isna().sum().to_dict().items()
+def clean_air_quality_dataframe(df: pd.DataFrame):
+    original_rows = len(df)
+    df = normalize_columns(df)
+    validate_dataframe(df)
+    missing_before = df.isna().sum().astype(int).to_dict()
+    before_dedup = len(df)
+    df = df.drop_duplicates().copy()
+    duplicate_rows_removed = before_dedup - len(df)
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    if df["Date"].isna().all():
+        raise HTTPException(status_code=400, detail="Date column could not be parsed.")
+    df = df.dropna(subset=["City", "Date"])
+    numeric_cols = [c for c in ["AQI"] + POLLUTANTS if c in df.columns]
+    for col in numeric_cols:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    for col in [c for c in POLLUTANTS if c in df.columns]:
+        df[col] = df.groupby("City")[col].transform(lambda s: s.fillna(s.median()))
+        overall = df[col].median()
+        if pd.notna(overall):
+            df[col] = df[col].fillna(overall)
+    # AQI remains factual; do not fabricate if missing, but drop rows with no AQI for analysis.
+    df = df.dropna(subset=["AQI"])
+    df = df.sort_values(["City", "Date"]).reset_index(drop=True)
+    missing_after = df.isna().sum().astype(int).to_dict()
+    summary = {
+        "original_rows": int(original_rows),
+        "cleaned_rows": int(len(df)),
+        "duplicate_rows_removed": int(duplicate_rows_removed),
+        "missing_values_before": missing_before,
+        "missing_values_after": missing_after,
     }
+    return df, summary
 
-
-def _detected_cities(dataframe: pd.DataFrame) -> list[str]:
-    cities = dataframe["City"].dropna().astype(str).unique().tolist()
-    return sorted(cities)
-
-
-def _preview_rows(dataframe: pd.DataFrame) -> list[dict[str, object]]:
-    preview = dataframe.head(10).copy()
+def dataframe_response(df: pd.DataFrame, summary: dict, filename: str) -> dict:
+    pollutants = [c for c in POLLUTANTS if c in df.columns]
+    preview = df.head(10).copy()
     preview["Date"] = preview["Date"].dt.strftime("%Y-%m-%d")
-    return json.loads(preview.to_json(orient="records"))
+    return {
+        "filename": filename,
+        **summary,
+        "columns": list(df.columns),
+        "detected_cities": sorted(df["City"].dropna().astype(str).unique().tolist()),
+        "detected_pollutants": pollutants,
+        "min_date": df["Date"].min().strftime("%Y-%m-%d"),
+        "max_date": df["Date"].max().strftime("%Y-%m-%d"),
+        "preview_rows": preview.where(pd.notnull(preview), None).to_dict(orient="records"),
+    }

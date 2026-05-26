@@ -1,28 +1,3 @@
-import {
-  ModulePlaceholder,
-  PageHeader,
-} from "@/components/layout/PageShell";
-import type { ModuleOverview } from "@/lib/types";
-
-const moduleOverview: ModuleOverview = {
-  label: "Public engagement",
-  title: "Content studio",
-  description:
-    "Shape reliable analysis into audience-appropriate climate awareness content.",
-  purpose:
-    "This studio will use deterministic templates and selected computed metrics to draft public notes, blog material, and professional social posts.",
-  capabilities: [
-    "Choose an insight and a communication format.",
-    "Draft content using only available evidence.",
-    "Review messaging before publishing outside AirLens.",
-  ],
-};
-
-export default function ContentStudioPage() {
-  return (
-    <>
-      <PageHeader {...moduleOverview} />
-      <ModulePlaceholder {...moduleOverview} />
-    </>
-  );
-}
+"use client";
+import { useEffect,useState } from "react"; import { PageShell } from "@/components/layout/PageShell"; import { Card } from "@/components/ui/Card"; import { Button } from "@/components/ui/Button"; import { Badge } from "@/components/ui/Badge"; import { getCities,generateContent,downloadText } from "@/lib/api";
+export default function Page(){ const [cities,setCities]=useState<string[]>([]),[city,setCity]=useState(""),[type,setType]=useState("blog-draft"),[aud,setAud]=useState("public"),[tone,setTone]=useState("formal"),[draft,setDraft]=useState<any>(null),[content,setContent]=useState(""); useEffect(()=>{getCities().then(c=>{setCities(c);setCity(c[0]||"")}).catch(()=>{})},[]); async function gen(){ const d=await generateContent(type,city,aud,tone); setDraft(d); setContent(d.content);} return <PageShell><div className="space-y-6"><div><Badge>Public communication</Badge><h1 className="mt-4 text-4xl font-bold text-slate-950">Content Studio</h1><p className="text-slate-600">Turn AQI analysis into blogs, posts, awareness points, and stakeholder notes.</p></div><Card><div className="grid gap-3 md:grid-cols-5"><select className="rounded-2xl border p-2" value={city} onChange={e=>setCity(e.target.value)}>{cities.map(c=><option key={c}>{c}</option>)}</select><select className="rounded-2xl border p-2" value={type} onChange={e=>setType(e.target.value)}><option value="blog-draft">Blog Draft</option><option value="linkedin-post">LinkedIn Post</option><option value="awareness-points">Awareness Points</option><option value="stakeholder-note">Stakeholder Note</option></select><select className="rounded-2xl border p-2" value={aud} onChange={e=>setAud(e.target.value)}><option>public</option><option>students</option><option>NGOs</option><option>government</option><option>researchers</option></select><select className="rounded-2xl border p-2" value={tone} onChange={e=>setTone(e.target.value)}><option>formal</option><option>simple</option><option>technical</option></select><Button onClick={gen}>Generate Draft</Button></div></Card>{draft&&<Card><h2 className="text-xl font-bold text-slate-950">{draft.title}</h2><textarea value={content} onChange={e=>setContent(e.target.value)} className="mt-4 h-72 w-full rounded-2xl border border-slate-200 p-4 text-sm"/><div className="mt-4 flex gap-3"><Button variant="secondary" onClick={()=>navigator.clipboard.writeText(content)}>Copy</Button><Button onClick={()=>downloadText(`${draft.title}.txt`, content)}>Download .txt</Button></div></Card>}</div></PageShell>}

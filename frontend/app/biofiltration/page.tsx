@@ -1,28 +1,3 @@
-import {
-  ModulePlaceholder,
-  PageHeader,
-} from "@/components/layout/PageShell";
-import type { ModuleOverview } from "@/lib/types";
-
-const moduleOverview: ModuleOverview = {
-  label: "Intervention notes",
-  title: "Biofiltration observations",
-  description:
-    "Document before-and-after environmental observations for intervention research.",
-  purpose:
-    "This is a software documentation module for comparing recorded observations around biofiltration or related interventions, not a hardware control system.",
-  capabilities: [
-    "Record intervention context and observation periods.",
-    "Compare before-and-after measured observations.",
-    "Capture cautious interpretation notes for review.",
-  ],
-};
-
-export default function BiofiltrationPage() {
-  return (
-    <>
-      <PageHeader {...moduleOverview} />
-      <ModulePlaceholder {...moduleOverview} />
-    </>
-  );
-}
+"use client";
+import { useEffect,useState } from "react"; import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"; import { PageShell } from "@/components/layout/PageShell"; import { Card } from "@/components/ui/Card"; import { Button } from "@/components/ui/Button"; import { Badge } from "@/components/ui/Badge"; import { Input } from "@/components/ui/Input"; import { bioCompare,bioRecords } from "@/lib/api";
+export default function Page(){const [form,setForm]=useState<any>({city:"Mumbai",pollutant:"PM2.5",before_value:80,after_value:65,intervention_type:"Algae-based biofiltration observation"}),[result,setResult]=useState<any>(null),[records,setRecords]=useState<any[]>([]); useEffect(()=>{bioRecords().then(setRecords).catch(()=>{})},[]); async function submit(){const r=await bioCompare({...form,before_value:Number(form.before_value),after_value:Number(form.after_value)});setResult(r);setRecords(await bioRecords())} const chart=[{name:"Before",value:Number(form.before_value)},{name:"After",value:Number(form.after_value)}]; return <PageShell><div className="space-y-6"><div><Badge>Intervention documentation</Badge><h1 className="mt-4 text-4xl font-bold text-slate-950">Biofiltration Comparison</h1><p className="text-slate-600">Documents before/after air quality observations for possible climate-tech or biofiltration interventions. It does not operate physical hardware.</p></div><Card><div className="grid gap-3 md:grid-cols-5">{["city","pollutant","before_value","after_value","intervention_type"].map(k=><Input key={k} placeholder={k} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})}/>)}</div><Button className="mt-4" onClick={submit}>Compare observation</Button></Card>{result&&<div className="grid gap-5 lg:grid-cols-2"><Card><p className="text-sm text-slate-500">Reduction</p><b className="text-4xl text-emerald-700">{result.reduction_percent}%</b><p className="mt-3 text-slate-700">{result.interpretation}</p><p className="mt-3 text-slate-600">{result.observation_note}</p></Card><Card><div className="h-72"><ResponsiveContainer><BarChart data={chart}><XAxis dataKey="name"/><YAxis/><Tooltip/><Bar dataKey="value"/></BarChart></ResponsiveContainer></div></Card></div>}<Card><h2 className="font-bold text-slate-950">Recent records</h2>{records.slice(0,5).map(r=><p key={r.id} className="mt-2 rounded-2xl bg-slate-50 p-3 text-sm text-slate-700">{r.city}: {r.pollutant} changed by {r.reduction_percent}%</p>)}</Card></div></PageShell>}

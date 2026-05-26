@@ -1,28 +1,4 @@
-import {
-  ModulePlaceholder,
-  PageHeader,
-} from "@/components/layout/PageShell";
-import type { ModuleOverview } from "@/lib/types";
-
-const moduleOverview: ModuleOverview = {
-  label: "Documentation",
-  title: "Research log",
-  description:
-    "Maintain a practical record of sources, observations, decisions, and drafts.",
-  purpose:
-    "This log will make research activity traceable by recording what was explored, which source supported it, and the status of resulting work.",
-  capabilities: [
-    "Capture research notes, sources, and tags.",
-    "Record activity dates and draft status.",
-    "Link evidence gathering to later communication outputs.",
-  ],
-};
-
-export default function ResearchLogPage() {
-  return (
-    <>
-      <PageHeader {...moduleOverview} />
-      <ModulePlaceholder {...moduleOverview} />
-    </>
-  );
-}
+"use client";
+import { useEffect,useState } from "react"; import { PageShell } from "@/components/layout/PageShell"; import { Card } from "@/components/ui/Card"; import { Button } from "@/components/ui/Button"; import { Badge } from "@/components/ui/Badge"; import { Input } from "@/components/ui/Input"; import { createResearchLog,deleteResearchLog,listResearchLogs } from "@/lib/api";
+const empty={title:"",topic:"",source_name:"",source_url:"",summary:"",tags:"",status:"Draft"};
+export default function Page(){const [items,setItems]=useState<any[]>([]),[form,setForm]=useState<any>(empty); const load=()=>listResearchLogs().then(setItems); useEffect(()=>{load()},[]); async function add(){await createResearchLog(form); setForm(empty); load()} return <PageShell><div className="space-y-6"><div><Badge>Research records</Badge><h1 className="mt-4 text-4xl font-bold text-slate-950">Research Log</h1><p className="text-slate-600">Track papers, articles, source notes, dataset observations, and draft status.</p></div><Card><div className="grid gap-3 md:grid-cols-3">{["title","topic","source_name","source_url","tags","status"].map(k=><Input key={k} placeholder={k} value={form[k]||""} onChange={e=>setForm({...form,[k]:e.target.value})}/>)}</div><textarea className="mt-3 h-24 w-full rounded-2xl border p-3" placeholder="summary" value={form.summary} onChange={e=>setForm({...form,summary:e.target.value})}/><Button className="mt-3" onClick={add}>Add research note</Button></Card><div className="grid gap-4 md:grid-cols-2">{items.map(r=><Card key={r.id}><div className="flex justify-between"><h2 className="text-xl font-bold text-slate-950">{r.title}</h2><Button variant="ghost" onClick={async()=>{await deleteResearchLog(r.id);load()}}>Delete</Button></div><p className="text-sm text-slate-600">{r.topic} · {r.source_name}</p><p className="mt-3 text-slate-700">{r.summary}</p><Badge className="mt-3">{r.status}</Badge></Card>)}</div></div></PageShell>}

@@ -1,37 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { PageShell } from "@/components/layout/PageShell";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "AirLens | Climate Intelligence Workspace",
-  description:
-    "Research and outreach intelligence for real Indian air quality data.",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full bg-background text-foreground">
-        <PageShell>{children}</PageShell>
-      </body>
-    </html>
-  );
-}
+export const metadata: Metadata = { title: "AirLens | Climate Intelligence Workspace", description: "Climate-tech research and outreach intelligence platform" };
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en"><body>{children}</body></html>; }

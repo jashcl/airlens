@@ -1,44 +1,23 @@
-"""Storage paths and file-writing helpers for uploaded datasets."""
-
 from pathlib import Path
+from fastapi import UploadFile
 
-import pandas as pd
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+UPLOAD_DIR = BASE_DIR / "data" / "uploads"
+PROCESSED_DIR = BASE_DIR / "data" / "processed"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
+LATEST_CLEANED_PATH = PROCESSED_DIR / "latest_cleaned_city_day.csv"
 
-BACKEND_DIRECTORY = Path(__file__).resolve().parents[2]
-UPLOAD_DIRECTORY = BACKEND_DIRECTORY / "data" / "uploads"
-PROCESSED_DIRECTORY = BACKEND_DIRECTORY / "data" / "processed"
-CLEANED_CITY_DAY_PATH = PROCESSED_DIRECTORY / "latest_cleaned_city_day.csv"
+def safe_filename(name: str) -> str:
+    return Path(name).name.replace(" ", "_")
 
+async def save_upload(file: UploadFile) -> Path:
+    filename = safe_filename(file.filename or "upload.csv")
+    path = UPLOAD_DIR / filename
+    content = await file.read()
+    path.write_bytes(content)
+    return path
 
-def validate_csv_filename(filename: str | None) -> str:
-    """Validate and safely reduce an uploaded name to its filename."""
-    if not filename:
-        raise ValueError("A CSV filename is required.")
-
-    safe_filename = Path(filename).name
-    if Path(safe_filename).suffix.lower() != ".csv":
-        raise ValueError("Only CSV files are supported. Please upload a .csv file.")
-
-    return safe_filename
-
-
-def validate_upload_content(content: bytes) -> None:
-    """Require upload content before CSV parsing and persistence."""
-    if not content:
-        raise ValueError("The uploaded CSV file is empty.")
-
-
-def save_uploaded_file(filename: str, content: bytes) -> Path:
-    """Save a validated uploaded CSV source file in the uploads directory."""
-    UPLOAD_DIRECTORY.mkdir(parents=True, exist_ok=True)
-    destination = UPLOAD_DIRECTORY / filename
-    destination.write_bytes(content)
-    return destination
-
-
-def save_cleaned_dataset(dataframe: pd.DataFrame) -> Path:
-    """Write the latest cleaned city-day dataset for downstream analysis."""
-    PROCESSED_DIRECTORY.mkdir(parents=True, exist_ok=True)
-    dataframe.to_csv(CLEANED_CITY_DAY_PATH, index=False, date_format="%Y-%m-%d")
-    return CLEANED_CITY_DAY_PATH
+def latest_cleaned_path() -> Path:
+    return LATEST_CLEANED_PATH
