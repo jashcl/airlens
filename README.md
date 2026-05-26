@@ -123,6 +123,3 @@ Primary file used:
 
 ```text
 city_day.csv
-
-```text
-city_day.csv
