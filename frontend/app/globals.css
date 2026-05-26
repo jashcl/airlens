@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f8f7;
+  --foreground: #10231f;
+  --muted-foreground: #5e716d;
+  --card: #ffffff;
+  --border: #e2ebe8;
+  --accent: #0f9f7a;
+  --accent-soft: #e5f6f1;
+  --sidebar: #071c1a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-sidebar: var(--sidebar);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+}
+
+::selection {
+  background: #b9ebdd;
+  color: #052e28;
+}
+
+.hero-grid {
+  background-image:
+    radial-gradient(circle at 80% 15%, rgba(16, 185, 129, 0.16), transparent 30%),
+    linear-gradient(rgba(15, 159, 122, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 159, 122, 0.05) 1px, transparent 1px);
+  background-size: auto, 36px 36px, 36px 36px;
+}

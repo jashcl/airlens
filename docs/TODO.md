@@ -3,6 +3,7 @@
 ## Completed
 
 - [x] Scaffold the FastAPI backend with SQLite session configuration, frontend CORS, a health endpoint, and placeholder feature routers.
+- [x] Scaffold the Next.js frontend with a climate-tech application shell, reusable UI components, and placeholder module pages.
 
 ## Upcoming
 
